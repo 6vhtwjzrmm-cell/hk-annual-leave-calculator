@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港离职员工年假计算器 | HK Annual Leave Calculator</title>
+    <style>
+        * { margin:0; padding:0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .content { padding: 40px; }
+
+        .info-banner {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-banner strong { color: #1976D2; }
+
+        .example-box {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        .example-box h5 {
+            font-size: 14px;
+            color: #7b1fa2;
+            margin-bottom: 8px;
+        }
+
+        .leave-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .leave-table th, .leave-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        .leave-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .leave-table tr:nth-child(even) { background: #f8f9fa; }
+        .leave-table tr:hover { background: #e3f2fd; }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        input[type="date"], input[type="number"] {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input[type="date"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+            margin: 0 auto 30px;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 0 auto 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn-reset {
+            background: #fff;
+            color: #666;
+            border: 2px solid #ddd;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset:hover {
+            border-color: #999;
+            color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-section {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .service-info {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .service-info h4 {
+            font-size: 16px;
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .service-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .service-info .info-label { color: #666; }
+        .service-info .info-value { font-weight: 600; color: #333; }
+
+        .leave-breakdown {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .leave-breakdown h4 {
+            font-size: 16px;
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .leave-breakdown .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .leave-breakdown .breakdown-row.total {
+            border-top: 2px solid #4caf50;
+            margin-top: 8px;
+            padding-top: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #2e7d32;
+        }
+
+        .result-total {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .result-total .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .result-total .value {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .result-total .unit {
+            font-size: 20px;
+            margin-left: 5px;
+        }
+
+        .calculation-details {
+            margin-top: 25px;
+        }
+
+        .detail-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .detail-section h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail-section h4 .icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .detail-label { color: #666; flex: 1; }
+        .detail-value { font-weight: 600; color: #333; text-align: right; flex: 1; }
+
+        .formula {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #856404;
+        }
+
+        .note strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .legal-banner-short { background:#fff3cd; border-left:4px solid #ffc107; color:#856404; }
+        .legal-banner-mid { background:#d4edda; border-left:4px solid #28a745; color:#155724; }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show { display: block; }
+
+        @media (max-width: 768px) {
+            .input-section { grid-template-columns: 1fr; }
+            .content { padding: 20px; }
+            .header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇭🇰 香港离职员工年假计算器</h1>
+            <p>Hong Kong Employment Ordinance Cap. 41 - Annual Leave Calculation Tool</p>
+        </div>
+
+        <div class="content">
+            <div class="info-banner">
+                <strong>📋 香港雇佣条例第41章 - 年假天数规定</strong><br>
+                雇员按连续性合约受雇每满 12 个月，便可享有有薪年假。年假天数按服务年期递增：
+                <table class="leave-table">
+                    <tr>
+                        <th>服务年期</th>
+                        <th>法定有薪年假</th>
+                    </tr>
+                    <tr><td>1-2年</td><td>7天</td></tr>
+                    <tr><td>3年</td><td>8天</td></tr>
+                    <tr><td>4年</td><td>9天</td></tr>
+                    <tr><td>5年</td><td>10天</td></tr>
+                    <tr><td>6年</td><td>11天</td></tr>
+                    <tr><td>7年</td><td>12天</td></tr>
+                    <tr><td>8年</td><td>13天</td></tr>
+                    <tr><td>9年或以上</td><td>14天</td></tr>
+                </table>
+                <small>* 本工具严格按照提供的计算案例逻辑编写</small>
+                
+                <div class="example-box">
+                    <h5>📌 正确计算逻辑（按真实案例）</h5>
+                    <strong>案例：</strong>2023/6/1入职，2026/7/24离职，年假14天，2026年已用5天<br>
+                    <strong>上一年度（2025/6/1~2026/5/31）法定：</strong>8天（整年，服务第3年）<br>
+                    <strong>本年度（2026/1/1~2026/7/24）按比例额外：</strong>(14-8) × 205/365 = 3.5天<br>
+                    <strong>本年度（2026/1/1~2026/7/24）按比例法定：</strong>9 × 205/365 = 5天（9是下一年度法定）<br>
+                    <strong>最终：</strong>8 + 3.5 + 5 - 5 = 11.5 ≈ 12天
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="joinDate">📅 入职日期 (Join Date)</label>
+                    <input type="date" id="joinDate" value="2023-06-01">
+                </div>
+
+                <div class="input-group">
+                    <label for="lastDate">📅 最后工作日 (Last Working Day)</label>
+                    <input type="date" id="lastDate" value="2026-07-24">
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="totalLeave">🏖️ 员工年假总天数 (Total Annual Leave Entitlement)</label>
+                    <input type="number" id="totalLeave" value="14" min="7" max="30" step="1">
+                    <small style="color: #666; margin-top: 5px; font-size: 12px;">注：输入员工享有的年假总天数（含法定年假及公司额外年假）</small>
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="leaveTaken">🏖️ 已使用年假天数 (Leave Taken in Current Year)</label>
+                    <input type="number" id="leaveTaken" value="5" min="0" max="30" step="1">
+                    <small style="color: #666; margin-top: 5px; font-size: 12px;">注：输入员工在离职年份（日历年）已使用的年假天数，例如2026年已用5天</small>
+                </div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="btn-group">
+                <button class="btn-calculate" onclick="calculateLeave()">
+                    🔢 计算年假 (Calculate Leave)
+                </button>
+                <button class="btn-reset" onclick="resetFields()">
+                    🔄 重置 (Reset)
+                </button>
+            </div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-header">📊 计算结果 (Calculation Result)</div>
+
+                <div class="result-summary">
+                    <!-- 法律条款判定横幅 -->
+                    <div id="legalStatusBanner" style="display:none; padding:15px; border-radius:8px; margin-bottom:20px; font-size:14px; font-weight:600;"></div>
+
+                    <div class="service-info">
+                        <h4>👤 服务年期信息 (Service Information)</h4>
+                        <div class="info-row">
+                            <span class="info-label">入职日期</span>
+                            <span class="info-value" id="displayJoinDate">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">最后工作日</span>
+                            <span class="info-value" id="displayLastDate">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">总服务天数</span>
+                            <span class="info-value" id="totalServiceDays">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">服务年期（完成整年数）</span>
+                            <span class="info-value" id="serviceYears">-</span>
+                        </div>
+                    </div>
+
+                    <div class="leave-breakdown">
+                        <h4>🏖️ 年假组成 (Leave Breakdown)</h4>
+                        <div class="breakdown-row">
+                            <span>法定年假 (Statutory Leave)</span>
+                            <span id="statutoryLeaveDisplay">- 天</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>额外年假 (Additional Leave)</span>
+                            <span id="additionalLeaveDisplay">- 天</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span>年假总天数 (Total Leave)</span>
+                            <span id="totalLeaveDisplay">- 天</span>
+                        </div>
+                    </div>
+
+                    <div class="leave-breakdown" style="margin-bottom: 20px;">
+                        <h4>💰 年假結算 (Leave Settlement)</h4>
+                        <div class="breakdown-row">
+                            <span>應休年假小計（未扣已用）</span>
+                            <span id="totalDaysDisplay">- 天</span>
+                        </div>
+                        <div class="breakdown-row">
+                            <span>已使用年假</span>
+                            <span id="leaveTakenDisplay">- 天</span>
+                        </div>
+                        <div class="breakdown-row total">
+                            <span>離職到期日未休完年假</span>
+                            <span id="finalDaysDisplay">- 天</span>
+                        </div>
+                    </div>
+
+                    <div class="result-total">
+                        <div class="label">離職到期日未休完年假</div>
+                        <div class="value" id="totalDays">0</div>
+                        <span class="unit">天</span>
+                    </div>
+
+                    <div class="calculation-details">
+                        <div class="detail-section">
+                            <h4><span class="icon">📜</span> 法定年假（上一年度累计）</h4>
+                            <div class="detail-row">
+                                <span class="detail-label">计算期间</span>
+                                <span class="detail-value" id="statLastPeriod">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">工作天数</span>
+                                <span class="detail-value" id="statLastDays">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">年度总天数</span>
+                                <span class="detail-value" id="statLastTotal">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">计算公式</span>
+                                <span class="detail-value" id="statLastFormula">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" style="font-weight: 700; color: #667eea;">计算结果</span>
+                                <span class="detail-value" style="font-weight: 700; color: #667eea; font-size: 16px;" id="statLastResult">-</span>
+                            </div>
+                            <div class="formula">
+                                上一年度 = 上一个服务年度（从入职周年日到下一周年日前一天）<br>
+                                整年服务：直接等于法定年假天数
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4><span class="icon">➕</span> 按比例额外年假</h4>
+                            <div class="detail-row">
+                                <span class="detail-label">计算期间</span>
+                                <span class="detail-value" id="proRataPeriod">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">工作天数</span>
+                                <span class="detail-value" id="proRataDays">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">年度总天数</span>
+                                <span class="detail-value" id="proRataTotal">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">计算公式</span>
+                                <span class="detail-value" id="proRataFormula">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" style="font-weight: 700; color: #667eea;">计算结果</span>
+                                <span class="detail-value" style="font-weight: 700; color: #667eea; font-size: 16px;" id="proRataResult">-</span>
+                            </div>
+                            <div class="formula">
+                                本年度 = 离职日历年（1月1日至离职日）<br>
+                                Pro-rata Additional = 额外年假天数 × 工作天数 / 年度总天数
+                            </div>
+                        </div>
+
+                        <div class="detail-section" id="proRataStatSection">
+                            <h4><span class="icon">⚖️</span> 按比例法定年假（本年度累计）</h4>
+                            <div class="detail-row">
+                                <span class="detail-label">计算期间</span>
+                                <span class="detail-value" id="proRataStatPeriod">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">工作天数</span>
+                                <span class="detail-value" id="proRataStatDays">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">年度总天数</span>
+                                <span class="detail-value" id="proRataStatTotal">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">计算公式</span>
+                                <span class="detail-value" id="proRataStatFormula">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label" style="font-weight: 700; color: #667eea;">计算结果</span>
+                                <span class="detail-value" style="font-weight: 700; color: #667eea; font-size: 16px;" id="proRataStatResult">-</span>
+                            </div>
+                            <div class="formula">
+                                本年度 = 离职日历年（1月1日至离职日）<br>
+                                Pro-rata Statutory = 下一年度法定天数 × 工作天数 / 年度总天数
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>⚠️ 香港《僱傭條例》相關條款 (Relevant Employment Ordinance Provisions):</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>受僱期少於3個月：</strong>僱員不享有有薪年假，僱主無須支付年假薪酬。</li>
+                        <li><strong>受僱期滿3個月但未滿12個月：</strong>可獲發放按比例計算的年假薪酬（因犯嚴重過失遭即時解僱除外）。</li>
+                        <li><strong>受僱期滿12個月：</strong>完整計算 — 上一年度（服務年度）+ 本年度按比例額外 + 本年度按比例法定。</li>
+                        <li>本年度 = 離職日曆年（從1月1日到離職日）</li>
+                        <li>本年度法定天數 = 下一年度的法定年假天數</li>
+                        <li>如有疑問，請諮詢公司HR部門或法律專業人士</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 香港雇佣条例 - 服务年期对应的法定年假天数
+        function getStatutoryLeaveDays(serviceYears) {
+            if (serviceYears < 3) return 7;      // 1-2年
+            if (serviceYears < 4) return 8;      // 3年
+            if (serviceYears < 5) return 9;      // 4年
+            if (serviceYears < 6) return 10;     // 5年
+            if (serviceYears < 7) return 11;     // 6年
+            if (serviceYears < 8) return 12;     // 7年
+            if (serviceYears < 9) return 13;     // 8年
+            return 14;                            // 9年或以上
+        }
+
+        // 计算服务年期（完成了多少整年）
+        function calculateServiceYears(joinDate, lastDate) {
+            var join = new Date(joinDate);
+            var last = new Date(lastDate);
+            
+            var years = last.getFullYear() - join.getFullYear();
+            var months = last.getMonth() - join.getMonth();
+            var days = last.getDate() - join.getDate();
+            
+            if (days < 0) {
+                months--;
+                var lastMonth = new Date(last.getFullYear(), last.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+            
+            return years;
+        }
+
+        // 计算服务月数（精确到月）
+        function calculateServiceMonths(joinDate, lastDate) {
+            var join = new Date(joinDate);
+            var last = new Date(lastDate);
+            
+            var years = last.getFullYear() - join.getFullYear();
+            var months = last.getMonth() - join.getMonth();
+            var days = last.getDate() - join.getDate();
+            
+            if (days < 0) {
+                months--;
+            }
+            
+            return years * 12 + months;
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            var d = new Date(date);
+            var year = d.getFullYear();
+            var month = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return year + '-' + month + '-' + day;
+        }
+
+        // 计算两个日期之间的天数（包含起始日和结束日）
+        function daysBetween(startDate, endDate) {
+            var start = new Date(startDate);
+            var end = new Date(endDate);
+            var diffTime = end.getTime() - start.getTime();
+            var diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            return diffDays;
+        }
+
+        // 判断是否为闰年
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+        }
+
+        // 四舍五入保留2位小数
+        function round2(num) {
+            return Math.round(num * 100) / 100;
+        }
+
+        // 法定年假取整规则
+        function applyStatutoryRounding(value) {
+            var decimal = value - Math.floor(value);
+            if (decimal <= 0.5) {
+                return Math.floor(value) + 0.5;
+            } else {
+                return Math.ceil(value);
+            }
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            var errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            document.getElementById('resultSection').classList.remove('show');
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+
+        // 主计算函数
+        function calculateLeave() {
+            hideError();
+
+            var joinDate = document.getElementById('joinDate').value;
+            var lastDate = document.getElementById('lastDate').value;
+            var totalLeave = parseInt(document.getElementById('totalLeave').value);
+            var leaveTaken = parseInt(document.getElementById('leaveTaken').value) || 0;
+
+            if (!joinDate || !lastDate || isNaN(totalLeave)) {
+                showError('❌ 请填写所有必填字段 (Please fill in all required fields)');
+                return;
+            }
+
+            if (new Date(joinDate) >= new Date(lastDate)) {
+                showError('❌ 最后工作日必须晚于入职日期 (Last working day must be later than join date)');
+                return;
+            }
+
+            if (totalLeave < 7 || totalLeave > 30) {
+                showError('❌ 年假总天数必须在 7-30 天之间 (Total leave days must be between 7-30)');
+                return;
+            }
+
+            if (leaveTaken < 0 || leaveTaken > totalLeave) {
+                showError('❌ 已使用年假天数必须在 0 至 ' + totalLeave + ' 天之间 (Leave taken must be between 0 and ' + totalLeave + ')');
+                return;
+            }
+
+            // 计算服务信息
+            var serviceYears = calculateServiceYears(joinDate, lastDate);
+            var serviceMonths = calculateServiceMonths(joinDate, lastDate);
+            var totalServiceDays = daysBetween(joinDate, lastDate);
+
+            // 根据服务年期确定法定年假天数
+            var statutoryLeave = getStatutoryLeaveDays(serviceYears);
+
+            // 计算额外年假 = 总年假 - 法定年假
+            var additionalLeave = totalLeave - statutoryLeave;
+
+            // ============================================
+            // 法律条款判定
+            // ============================================
+            var legalBanner = document.getElementById('legalStatusBanner');
+            var isShortService = false;  // 不足3个月
+            var isMidService = false;    // 3-12个月
+            var finalResult, totalResult;
+            var statLastResult = 0;
+            var proRataAdditionalResult = 0;
+            var proRataStatutoryResult = 0;
+
+            if (serviceMonths < 3) {
+                // 情况1: 受雇期不足3个月 → 无年假
+                isShortService = true;
+                legalBanner.style.display = 'block';
+                legalBanner.className = 'legal-banner-short';
+                legalBanner.style.padding = '15px';
+                legalBanner.style.borderRadius = '8px';
+                legalBanner.style.marginBottom = '20px';
+                legalBanner.style.fontSize = '14px';
+                legalBanner.style.fontWeight = '600';
+                legalBanner.innerHTML = '⚠️ <strong>法律條款判定：受僱期不足3個月</strong><br>' +
+                    '根據香港《僱傭條例》，受僱期少於3個月（試用期未過）的僱員，<strong>僱主無須支付年假薪酬</strong>。';
+                totalResult = 0;
+                finalResult = 0;
+                statutoryLeave = 0;
+                additionalLeave = 0;
+
+            } else if (serviceMonths >= 3 && serviceYears < 1) {
+                // 情况2: 受雇3-12个月 → 按比例计算（无"上一年度"）
+                isMidService = true;
+                legalBanner.style.display = 'block';
+                legalBanner.className = 'legal-banner-mid';
+                legalBanner.style.padding = '15px';
+                legalBanner.style.borderRadius = '8px';
+                legalBanner.style.marginBottom = '20px';
+                legalBanner.style.fontSize = '14px';
+                legalBanner.style.fontWeight = '600';
+                legalBanner.innerHTML = '✅ <strong>法律條款判定：受僱期滿3個月但未滿12個月</strong><br>' +
+                    '根據香港《僱傭條例》，僱員在假期年內受僱滿3個月但未滿12個月，<br>' +
+                    '<strong>可獲發放按比例計算的年假薪酬</strong>（除非因犯嚴重過失而遭即時解僱）。';
+
+                // 第一年法定 = 7天
+                var firstYearStatutory = 7;
+                additionalLeave = totalLeave - firstYearStatutory;
+
+                // 使用同一年度内的工作天数
+                var joinYearNum = new Date(joinDate).getFullYear();
+                var lastYearNum = new Date(lastDate).getFullYear();
+
+                var statStartDate, statEndDate;
+                if (joinYearNum === lastYearNum) {
+                    // 入职和离职在同一年：从入职日到离职日
+                    statStartDate = joinDate;
+                    statEndDate = lastDate;
+                } else {
+                    // 跨年：从1月1日到离职日
+                    statStartDate = lastYearNum + '-01-01';
+                    statEndDate = lastDate;
+                }
+                var workDaysCurrent = daysBetween(statStartDate, statEndDate);
+                var totalDaysCurrent = isLeapYear(new Date(statEndDate).getFullYear()) ? 366 : 365;
+
+                // 按比例额外年假
+                proRataAdditionalResult = round2(additionalLeave * workDaysCurrent / totalDaysCurrent);
+                // 按比例法定年假
+                proRataStatutoryResult = round2(firstYearStatutory * workDaysCurrent / totalDaysCurrent);
+
+                totalResult = Math.ceil(proRataAdditionalResult + proRataStatutoryResult);
+                finalResult = Math.max(0, totalResult - leaveTaken);
+
+                // 更新法定年假显示
+                statutoryLeave = firstYearStatutory;
+
+                // 保存UI更新数据
+                window._midData = {
+                    statStart: statStartDate,
+                    statEnd: statEndDate,
+                    workDays: workDaysCurrent,
+                    totalDays: totalDaysCurrent
+                };
+
+            } else {
+                // 情况3: 受雇满12个月 → 完整计算
+                isShortService = false;
+                isMidService = false;
+                legalBanner.style.display = 'none';
+
+                // ============================================
+                // 计算上一年度（上一个服务年度）
+                // ============================================
+                var join = new Date(joinDate);
+                var last = new Date(lastDate);
+                var joinMonth = join.getMonth();
+                var joinDay = join.getDate();
+                var lastYear = last.getFullYear();
+
+                var lastServiceYearStart, lastServiceYearEnd;
+                var anniversaryThisYear = new Date(lastYear, joinMonth, joinDay);
+                
+                if (last >= anniversaryThisYear) {
+                    lastServiceYearStart = new Date(lastYear - 1, joinMonth, joinDay);
+                    lastServiceYearEnd = new Date(lastYear, joinMonth, joinDay - 1);
+                } else {
+                    lastServiceYearStart = new Date(lastYear - 2, joinMonth, joinDay);
+                    lastServiceYearEnd = new Date(lastYear - 1, joinMonth, joinDay - 1);
+                }
+
+                var daysInLastYear = daysBetween(lastServiceYearStart, lastServiceYearEnd);
+                var totalDaysInLastYear = daysBetween(lastServiceYearStart, new Date(lastServiceYearStart.getFullYear() + 1, joinMonth, joinDay - 1));
+
+                if (daysInLastYear >= totalDaysInLastYear - 1) {
+                    statLastResult = statutoryLeave;
+                } else {
+                    var statLastCalc = round2(statutoryLeave * daysInLastYear / totalDaysInLastYear);
+                    statLastResult = applyStatutoryRounding(statLastCalc);
+                }
+
+                // ============================================
+                // 计算本年度（离职日历年：1月1日 到 离职日）
+                // ============================================
+                var currentYearStart = new Date(lastYear, 0, 1);
+                var daysInCurrentYear = daysBetween(currentYearStart, lastDate);
+                var totalDaysInCurrentYear = isLeapYear(lastYear) ? 366 : 365;
+
+                proRataAdditionalResult = round2(additionalLeave * daysInCurrentYear / totalDaysInCurrentYear);
+
+                var nextYearStatutory = getStatutoryLeaveDays(serviceYears + 1);
+                proRataStatutoryResult = round2(nextYearStatutory * daysInCurrentYear / totalDaysInCurrentYear);
+
+                totalResult = Math.ceil(statLastResult + proRataAdditionalResult + proRataStatutoryResult);
+                finalResult = Math.max(0, totalResult - leaveTaken);
+
+                // 保存UI更新数据
+                window._calcData = {
+                    lastServiceYearStart: lastServiceYearStart,
+                    lastServiceYearEnd: lastServiceYearEnd,
+                    daysInLastYear: daysInLastYear,
+                    totalDaysInLastYear: totalDaysInLastYear,
+                    currentYearStart: currentYearStart,
+                    daysInCurrentYear: daysInCurrentYear,
+                    totalDaysInCurrentYear: totalDaysInCurrentYear,
+                    nextYearStatutory: nextYearStatutory
+                };
+            }
+
+            // ============================================
+            // 更新服务信息（所有情况共用）
+            // ============================================
+            document.getElementById('displayJoinDate').textContent = formatDate(joinDate);
+            document.getElementById('displayLastDate').textContent = formatDate(lastDate);
+            document.getElementById('totalServiceDays').textContent = totalServiceDays + ' 天 (' + serviceMonths + ' 個月)';
+            document.getElementById('serviceYears').textContent = serviceYears + ' 年';
+
+            // 更新年假组成
+            document.getElementById('statutoryLeaveDisplay').textContent = statutoryLeave + ' 天';
+            document.getElementById('additionalLeaveDisplay').textContent = additionalLeave + ' 天';
+            document.getElementById('totalLeaveDisplay').textContent = totalLeave + ' 天';
+
+            // ============================================
+            // 更新UI - 总计
+            // ============================================
+            document.getElementById('totalDays').textContent = finalResult;
+            document.getElementById('totalDaysDisplay').textContent = totalResult + ' 天';
+            document.getElementById('leaveTakenDisplay').textContent = leaveTaken + ' 天';
+            document.getElementById('finalDaysDisplay').textContent = finalResult + ' 天';
+
+            // ============================================
+            // 更新详细计算面板
+            // ============================================
+            if (isShortService) {
+                // 情况1: 不足3个月 - 隐藏所有详细计算
+                document.getElementById('statLastPeriod').textContent = '—';
+                document.getElementById('statLastDays').textContent = '—';
+                document.getElementById('statLastTotal').textContent = '—';
+                document.getElementById('statLastFormula').textContent = '受僱期不足3個月，無年假權益';
+                document.getElementById('statLastResult').textContent = '0 天';
+
+                document.getElementById('proRataPeriod').textContent = '—';
+                document.getElementById('proRataDays').textContent = '—';
+                document.getElementById('proRataTotal').textContent = '—';
+                document.getElementById('proRataFormula').textContent = '受僱期不足3個月，無年假權益';
+                document.getElementById('proRataResult').textContent = '0 天';
+
+                document.getElementById('proRataStatSection').style.display = 'none';
+
+            } else if (isMidService) {
+                // 情况2: 3-12个月 - 只显示按比例计算
+                var d = window._midData;
+                document.getElementById('statLastPeriod').textContent = '—（受僱未滿12個月，無上一年度）';
+                document.getElementById('statLastDays').textContent = '—';
+                document.getElementById('statLastTotal').textContent = '—';
+                document.getElementById('statLastFormula').textContent = '受僱未滿12個月，不適用上一年度累計';
+                document.getElementById('statLastResult').textContent = '0 天';
+
+                document.getElementById('proRataPeriod').textContent = formatDate(d.statStart) + ' 至 ' + formatDate(d.statEnd);
+                document.getElementById('proRataDays').textContent = d.workDays + ' 天';
+                document.getElementById('proRataTotal').textContent = d.totalDays + ' 天 (' + (isLeapYear(new Date(d.statEnd).getFullYear()) ? '閏年' : '平年') + ')';
+                document.getElementById('proRataFormula').textContent = 
+                    'ROUND(' + additionalLeave + ' × ' + d.workDays + ' / ' + d.totalDays + ', 2) = ' + round2(additionalLeave * d.workDays / d.totalDays);
+                document.getElementById('proRataResult').textContent = proRataAdditionalResult + ' 天';
+
+                document.getElementById('proRataStatSection').style.display = 'block';
+                document.getElementById('proRataStatPeriod').textContent = formatDate(d.statStart) + ' 至 ' + formatDate(d.statEnd);
+                document.getElementById('proRataStatDays').textContent = d.workDays + ' 天';
+                document.getElementById('proRataStatTotal').textContent = d.totalDays + ' 天 (' + (isLeapYear(new Date(d.statEnd).getFullYear()) ? '閏年' : '平年') + ')';
+                document.getElementById('proRataStatFormula').textContent = 
+                    'ROUND(' + statutoryLeave + ' × ' + d.workDays + ' / ' + d.totalDays + ', 2) = ' + round2(statutoryLeave * d.workDays / d.totalDays);
+                document.getElementById('proRataStatResult').textContent = proRataStatutoryResult + ' 天';
+
+            } else {
+                // 情况3: 满12个月 - 完整计算
+                var cd = window._calcData;
+                document.getElementById('statLastPeriod').textContent = 
+                    formatDate(cd.lastServiceYearStart) + ' 至 ' + formatDate(cd.lastServiceYearEnd);
+                document.getElementById('statLastDays').textContent = cd.daysInLastYear + ' 天';
+                document.getElementById('statLastTotal').textContent = cd.totalDaysInLastYear + ' 天 (' + (isLeapYear(cd.lastServiceYearStart.getFullYear()) ? '閏年' : '平年') + ')';
+                
+                if (cd.daysInLastYear >= cd.totalDaysInLastYear - 1) {
+                    document.getElementById('statLastFormula').textContent = '整年服務，直接 = ' + statutoryLeave + ' 天';
+                } else {
+                    document.getElementById('statLastFormula').textContent = 
+                        'ROUND(' + statutoryLeave + ' × ' + cd.daysInLastYear + ' / ' + cd.totalDaysInLastYear + ', 2) = ' + round2(statutoryLeave * cd.daysInLastYear / cd.totalDaysInLastYear);
+                }
+                document.getElementById('statLastResult').textContent = statLastResult + ' 天';
+
+                document.getElementById('proRataPeriod').textContent = 
+                    formatDate(cd.currentYearStart) + ' 至 ' + formatDate(lastDate);
+                document.getElementById('proRataDays').textContent = cd.daysInCurrentYear + ' 天';
+                document.getElementById('proRataTotal').textContent = cd.totalDaysInCurrentYear + ' 天 (' + (isLeapYear(new Date(lastDate).getFullYear()) ? '閏年' : '平年') + ')';
+                document.getElementById('proRataFormula').textContent = 
+                    'ROUND(' + additionalLeave + ' × ' + cd.daysInCurrentYear + ' / ' + cd.totalDaysInCurrentYear + ', 2) = ' + round2(additionalLeave * cd.daysInCurrentYear / cd.totalDaysInCurrentYear);
+                document.getElementById('proRataResult').textContent = proRataAdditionalResult + ' 天';
+
+                document.getElementById('proRataStatSection').style.display = 'block';
+                document.getElementById('proRataStatPeriod').textContent = 
+                    formatDate(cd.currentYearStart) + ' 至 ' + formatDate(lastDate);
+                document.getElementById('proRataStatDays').textContent = cd.daysInCurrentYear + ' 天';
+                document.getElementById('proRataStatTotal').textContent = cd.totalDaysInCurrentYear + ' 天 (' + (isLeapYear(new Date(lastDate).getFullYear()) ? '閏年' : '平年') + ')';
+                document.getElementById('proRataStatFormula').textContent = 
+                    'ROUND(' + cd.nextYearStatutory + ' × ' + cd.daysInCurrentYear + ' / ' + cd.totalDaysInCurrentYear + ', 2) = ' + round2(cd.nextYearStatutory * cd.daysInCurrentYear / cd.totalDaysInCurrentYear);
+                document.getElementById('proRataStatResult').textContent = proRataStatutoryResult + ' 天';
+            }
+
+            // 显示结果
+            var resultSec = document.getElementById('resultSection');
+            resultSec.style.display = '';  // 清除可能残留的 inline style
+            resultSec.classList.add('show');
+
+            // 滚动到结果区域
+            setTimeout(function() {
+                document.getElementById('resultSection').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 100);
+        }
+
+        // 重置所有输入字段
+        function resetFields() {
+            document.getElementById('joinDate').value = '';
+            document.getElementById('lastDate').value = '';
+            document.getElementById('totalLeave').value = '';
+            document.getElementById('leaveTaken').value = '';
+            hideError();
+            var resultSec = document.getElementById('resultSection');
+            resultSec.classList.remove('show');
+            resultSec.style.display = '';
+        }
+
+        // 页面加载时自动计算示例
+        window.onload = function() {
+            calculateLeave();
+        };
+    </script>
+</body>
+</html>
