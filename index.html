@@ -895,8 +895,10 @@
                 var prevYearTotal = isLeapYear(prevYear) ? 366 : 365;
 
                 // 截至上一个日历年年底的服务年期 → 决定法定天数
-                var serviceYearsAtPrevYE = serviceYearsAsOf(joinDate, prevCalEnd);
-                var statutoryAtPrevY = getStatutoryLeaveDays(serviceYearsAtPrevYE);
+                // 公司指引：用「正进行的服务年度」(已完成整年数 + 1)来决定法定天数
+                var serviceYearsAtPrevYE = serviceYearsAsOf(joinDate, prevCalEnd); // 完成的整年数
+                var currentServiceYearAtPrevYE = serviceYearsAtPrevYE + 1; // 正进行的服务年度
+                var statutoryAtPrevY = getStatutoryLeaveDays(currentServiceYearAtPrevYE);
 
                 if (prevWorkDays >= prevYearTotal - 1) {
                     // 整个日历年在职 → 直接等于法定天数
@@ -926,10 +928,14 @@
                 var currWorkDays = daysBetween(currYearStart, lastDate);
                 var currYearTotal = isLeapYear(leaveYear) ? 366 : 365;
 
-                var currentStatutory = getStatutoryLeaveDays(serviceYears); // 当前服务年期的法定
-                var additionalLeave = totalLeave - currentStatutory;
+                // 当前日历年对应的法定天数（正进行的服务年度）
+                var serviceYearsAtCurrYE = serviceYearsAsOf(joinDate, leaveYear + '-12-31');
+                var serviceYearAtCurrYE = serviceYearsAtCurrYE + 1;
+                var statutoryThisY = getStatutoryLeaveDays(serviceYearAtCurrYE);
 
-                proRataAddAccrued = applyHalfDayRounding(round2(additionalLeave * currWorkDays / currYearTotal));
+                // Pro-rata Additional = (当年法定 - 上年法定) × 当年工作天数/365
+                var statIncr = Math.max(0, statutoryThisY - statutoryAtPrevY);
+                proRataAddAccrued = applyHalfDayRounding(round2(statIncr * currWorkDays / currYearTotal));
                 proRataAddUnused = Math.max(0, statPrevAccrued + proRataAddAccrued - leaveTakenCurrent) - Math.max(0, statPrevAccrued - leaveTakenCurrent);
                 // 更准确的 unused 计算:
                 var currentTotalAccrued = statPrevAccrued + proRataAddAccrued;
@@ -944,14 +950,16 @@
                     period: currYearStart + ' 至 ' + formatDate(lastDate),
                     workDays: currWorkDays,
                     totalDays: currYearTotal + ' 天 (' + (isLeapYear(leaveYear) ? '閏年' : '平年') + ')',
-                    base: additionalLeave + ' 天',
-                    formula: 'ROUND(' + additionalLeave + ' × ' + currWorkDays + ' / ' + currYearTotal + ', 2) = ' + round2(additionalLeave * currWorkDays / currYearTotal),
+                    base: statIncr + ' 天 (当年法定' + statutoryThisY + ' - 上年法定' + statutoryAtPrevY + ')',
+                    formula: 'ROUND(' + statIncr + ' × ' + currWorkDays + ' / ' + currYearTotal + ', 2) = ' + round2(statIncr * currWorkDays / currYearTotal),
                     result: proRataAddAccrued
                 };
 
                 // ---------- ③ 下年度按比例法定年假 ----------
-                var nextYearStatutory = getStatutoryLeaveDays(serviceYears + 1);
-                proRataStatAccrued = applyHalfDayRounding(round2(nextYearStatutory * currWorkDays / currYearTotal));
+                // 使用当年法定天数作为下年度按比例基数（即第5年 = 10天）
+                var nextYearStatutory = statutoryThisY;
+                // 公司采用向上取整（CEILING）
+                proRataStatAccrued = Math.ceil(round2(nextYearStatutory * currWorkDays / currYearTotal));
                 proRataStatUnused = Math.max(0, proRataStatAccrued - leaveTakenNext);
 
                 calcData.proRataStat = {
@@ -977,7 +985,7 @@
 
                 // 更新详细面板
                 updateDetailPanels_Full(calcData);
-                updateServiceInfo(joinDate, lastDate, totalServiceDays, serviceMonths, serviceYears, currentStatutory, additionalLeave);
+                updateServiceInfo(joinDate, lastDate, totalServiceDays, serviceMonths, serviceYears, statutoryAtPrevY, additionalLeave);
             }
 
             // 显示总计
